@@ -1,7 +1,7 @@
 {
   "name": "hook-up",
   "description": "2d hooks - better than events or simple hooks",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "https://github.com/paulpflug/",
   "author": {
     "name": "Paul Pflugradt",

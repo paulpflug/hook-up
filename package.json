@@ -1,6 +1,6 @@
 {
   "name": "hook-up",
-  "description": "2d hooks - better than events or simple hooks",
+  "description": "Create your own hook api with 2-dimensional hooks - better than events or simple hooks",
   "version": "0.0.1",
   "homepage": "https://github.com/paulpflug/",
   "author": {
@@ -21,9 +21,9 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "coffeescript": "^2.0.0-beta3",
+    "coffeescript": "^2.0.2",
     "script-runner": "^0.1.7",
-    "mocha": "^3.5.3",
+    "mocha": "^4.0.1",
     "chai": "^4.1.2"
   },
   "keywords": [],

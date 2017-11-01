@@ -9,16 +9,36 @@ describe "hook-up", =>
     hookUp(obj)
     obj.registerHooks ["hook1","hook2"]
     test = 0
-    obj.before.hook1.call (o) ->
+    obj.hook1.register (o) ->
       test = o.test + @test
-    await obj.before.hook1({test:2})
+    await obj.hook1.execute({test:2})
     test.should.equal 5
   it "should work async", =>
     hookUp(obj)
     obj.registerHooks "hook"
     test = 0
-    obj.before.hook.call => test++
-    obj.before.hook.call => test++
+    obj.hook.register => test++
+    obj.hook.register => test++
+    obj.hook.register => test++
+    await obj.hook.execute()
+    test.should.equal 3
+  it "should work with custom names", =>
+    hookUp(obj, register: "", execute:"call")
+    obj.registerHooks "hook"
+    test = 0
+    obj.hook => test++
+    await obj.hook.call()
+    test.should.equal 1
+    hookUp(obj, register: "reg", execute:"")
+    obj.registerHooks "hook"
+    test = 0
+    obj.hook.reg => test++
+    await obj.hook()
+    test.should.equal 1
+  it "should work with prefix", =>
+    hookUp(obj, register: "call", execute:"", prefix:"before")
+    obj.registerHooks "hook"
+    test = 0
     obj.before.hook.call => test++
     await obj.before.hook()
-    test.should.equal 3
+    test.should.equal 1

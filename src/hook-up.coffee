@@ -6,19 +6,19 @@ arrayize = (obj) =>
     return [obj]
   return []
 
-getHook = (obj) =>
+getHook = (obj, options) =>
   arr = []
   exec = null
-  hook = (o) => 
-    exec = getExec() unless exec?
+  execute = (o) => 
+    exec ?= getExec()
     await exec(o)
-  hook.call = (o) =>
+  register = (o) =>
     if isFunction(o)
       o = hook: o, prio: 0
     unless o?.hook? and o.prio?
       throw new Error "a hook needs a 'hook' and a 'prio' property"
     arr.push o
-    hook.exec = exec = null
+    exec = null
   getExec = =>
     reduced = (arr.reduce ((acc, current) =>
         tmp = acc[current.prio] ?= [] 
@@ -29,23 +29,42 @@ getHook = (obj) =>
         return hooks[0]
       else
         return (o) => Promise.all hooks.map (hook) => hook(o)
-    return hook.exec = exec = (o) =>
+    return exec = (o) =>
       for callHooks in reduced
         await callHooks(o)
-  hook.clear = =>
+  if options.register == ""
+    hook = register
+    hook[options.execute] = execute
+  else if options.execute == ""
+    hook = execute
+    hook[options.register] = register
+  else
+    hook = {}
+    hook[options.execute] = execute
+    hook[options.register] = register
+  hook[options.clear] = =>
     hook._hooks = arr = []
-    hook.exec = exec = null
+    exec = null
   hook._hooks = arr
   return hook
 
-module.exports = (obj, prefix) =>
-  prefix ?= ["before","after"]
-  prefix = arrayize(prefix)
-  for prop in prefix
-    obj[prop] = {}
+module.exports = (obj, options) =>
+  options ?= {}
+  if options.prefix?
+    prefix = arrayize(options.prefix)
+  options.register ?= "register"
+  options.execute ?= "execute"
+  options.clear ?= "clear"
+
   obj.registerHooks = (names) =>
     names = arrayize(names)
-    for prop in prefix
-      tmp = obj[prop]
+    if prefix
+      for prop in prefix
+        obj[prop] = {}
+      for prop in prefix
+        tmp = obj[prop]
+        for name in names
+          tmp[name] = getHook(obj, options)
+    else
       for name in names
-        tmp[name] = getHook(obj)
+        obj[name] = getHook(obj, options)

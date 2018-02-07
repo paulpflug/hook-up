@@ -6,39 +6,56 @@ obj = {
 }
 describe "hook-up", =>
   it "should work", =>
-    hookUp(obj)
-    obj.registerHooks ["hook1","hook2"]
+    hookUp obj, ["action1","action2"]
     test = 0
-    obj.hook1.register (o) ->
+    obj.action1.hookIn (o) ->
       test = o.test + @test
-    await obj.hook1.execute({test:2})
+    await obj.action1({test:2})
     test.should.equal 5
+
   it "should work async", =>
-    hookUp(obj)
-    obj.registerHooks "hook"
+    hookUp obj, actions: "action"
     test = 0
-    obj.hook.register => test++
-    obj.hook.register => test++
-    obj.hook.register => test++
-    await obj.hook.execute()
+    obj.action.hookIn => test++
+    obj.action.hookIn => test++
+    obj.action.hookIn => test++
+    await obj.action()
     test.should.equal 3
+
   it "should work with custom names", =>
-    hookUp(obj, register: "", execute:"call")
-    obj.registerHooks "hook"
+    hookUp obj,
+      actions: "action"
+      names:
+        hookIn: ""
+        call:"call"
     test = 0
-    obj.hook => test++
-    await obj.hook.call()
+    obj.action => test++
+    await obj.action.call()
     test.should.equal 1
-    hookUp(obj, register: "reg", execute:"")
-    obj.registerHooks "hook"
+    hookUp obj, 
+      actions: "action"
+      names:
+        hookIn: "reg"
     test = 0
-    obj.hook.reg => test++
-    await obj.hook()
+    obj.action.reg => test++
+    await obj.action()
     test.should.equal 1
+
   it "should work with prefix", =>
-    hookUp(obj, register: "call", execute:"", prefix:"before")
-    obj.registerHooks "hook"
+    hookUp obj,
+      actions: 
+       before: "action"
     test = 0
-    obj.before.hook.call => test++
-    await obj.before.hook()
+    obj.before.action.hookIn => test++
+    await obj.before.action()
     test.should.equal 1
+
+  it "should catch", (done) =>
+    hookUp obj,
+      actions: "action"
+      catch: =>
+        done()
+        return
+    obj.action.hookIn => throw new Error()
+    obj.action()
+    return 

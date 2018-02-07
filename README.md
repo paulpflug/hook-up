@@ -47,7 +47,7 @@ Each callback only interacts with the current (action and/or program) state.
 
 A plugin can hook in in those actions on any position.
 
-This package is an action builder:
+This package is an action builder working in node and in browser (in combination with e.g. webpack)
 
 
 ### Install
@@ -102,6 +102,8 @@ program.run.hookIn(program.position.init, (state) => {
   // init state somehow
 })
 ```
+
+For the separation by functionality design pattern each functionality needs to be a separate plugin (not necessarily a separate package). These plugins need access to the actions of your program.
 #### Options
 Name | type | default | description
 ---:| --- | ---| ---

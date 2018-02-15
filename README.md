@@ -11,8 +11,6 @@ Over the last few years of programming I produced two very helpful guidelines
 - aim for declarative programming
 - separate by functionality
 
-(please note the absence of object orientated programming - which is *often* increasing complexity without any gain)
-
 ## Aim for declarative programming
 
 Make your programs work with configuration files - the most common type of declarative programming.

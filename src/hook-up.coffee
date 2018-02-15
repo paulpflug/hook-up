@@ -84,7 +84,10 @@ module.exports = (obj, options) ->
       options.default = position[defaultPosition]
 
     obj[names.position] = position
-
+    _actions = []
+    obj[names.reset+"AllActions"] = =>
+      for _action in _actions
+        _action._chain = []
     actions = options.actions
     if isString(actions)
       actions = [actions]
@@ -98,6 +101,6 @@ module.exports = (obj, options) ->
         tmp = obj
       for action in arrayize(v)
         actionName = if k then k+"."+action else action
-        tmp[action] = setupAction(actionName, obj, options)
+        _actions.push tmp[action] = setupAction(actionName, obj, options)
 
   

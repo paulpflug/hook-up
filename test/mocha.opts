@@ -1,4 +1,0 @@
---require coffeescript/register
-
---timeout 2500
-test/hook-up.coffee

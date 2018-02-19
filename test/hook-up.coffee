@@ -1,61 +1,47 @@
-chai = require "chai"
-should = chai.should()
+{test} = require "snapy"
 hookUp = require "../src/hook-up.coffee"
 obj = {
   test: 3
 }
-describe "hook-up", =>
-  it "should work", =>
-    hookUp obj, ["action1","action2"]
-    test = 0
-    obj.action1.hookIn (o) ->
-      test = o.test + @test
-    await obj.action1({test:2})
-    test.should.equal 5
+test (snap) =>
+  hookUp obj, ["action1","action2"]
+  obj.action1.hookIn (o, _obj) -> 
+    o.test += @test + _obj.test
+  # result 8
+  snap promise: obj.action1({test:2})
+  adder = (o) => o.test++
+  obj.action2.hookIn adder
+  obj.action2.hookIn adder
+  obj.action2.hookIn adder
+  # result 3
+  snap promise: obj.action2(test:0)
+  hookUp obj,
+    actions: "action"
+    names:
+      hookIn: ""
+      call:"call"
+  obj.action (o) => o.success = true
+  snap promise: obj.action.call({})
 
-  it "should work async", =>
-    hookUp obj, actions: "action"
-    test = 0
-    obj.action.hookIn => test++
-    obj.action.hookIn => test++
-    obj.action.hookIn => test++
-    await obj.action()
-    test.should.equal 3
+  hookUp obj, 
+    actions: "action"
+    names:
+      hookIn: "reg"
+  obj.action.reg (o) => o.success = true
+  snap promise: obj.action({})
 
-  it "should work with custom names", =>
-    hookUp obj,
-      actions: "action"
-      names:
-        hookIn: ""
-        call:"call"
-    test = 0
-    obj.action => test++
-    await obj.action.call()
-    test.should.equal 1
-    hookUp obj, 
-      actions: "action"
-      names:
-        hookIn: "reg"
-    test = 0
-    obj.action.reg => test++
-    await obj.action()
-    test.should.equal 1
 
-  it "should work with prefix", =>
-    hookUp obj,
-      actions: 
-       before: "action"
-    test = 0
-    obj.before.action.hookIn => test++
-    await obj.before.action()
-    test.should.equal 1
+  # should work with prefix
+  hookUp obj,
+    actions: 
+      before: "action"
+  obj.before.action.hookIn (o) => o.success = true
+  snap promise: obj.before.action({})
 
-  it "should catch", (done) =>
-    hookUp obj,
-      actions: "action"
-      catch: =>
-        done()
-        return
-    obj.action.hookIn => throw new Error()
-    obj.action()
-    return 
+
+  # should work with catch
+  hookUp obj,
+    actions: "action"
+    catch: => return "success"
+  obj.action.hookIn => throw new Error()
+  snap promise: obj.action()

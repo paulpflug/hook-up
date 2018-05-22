@@ -69,14 +69,16 @@ hookUp(program,{
   },
   catch: {
     "cache.get": (e) => { console.error(e) } 
-  }
+  },
+  args: [someArg]
 })
 
 // hookIn([position:Number], cb:Function)
 // position defaults to program.position.during
 // (see below)
-program.run.hookIn((state,{config}) => {
+program.run.hookIn((state,{config},someArg) => {
   // config equals program.config
+  // someArg is passed from above
   // it is recommend to test the state if you depend on it
   // as you have no idea what the previous cbs did
   if (// is in correct state) {
@@ -110,6 +112,7 @@ catch | Object | - | lookup object to apply default catch functions to actions
 spread | Number | 8 | distance between the predefined positions
 position | Object | - | lookup object to use as predefined positions
 Promise | Object | native Promise | Promise lib to use
+args | Object or Array of Objects | - | additonal args passed on each action call
 names | Object | - | see below
 
 you can change the default names:

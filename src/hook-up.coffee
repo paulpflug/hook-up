@@ -12,17 +12,27 @@ positions = ["init","before","during","after","end"]
 
 defaultPosition = "during"
 
-setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise}) ->
+setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args}) ->
 
   catcher = catcher[actionName] if catcher? and not isFunction(catcher)
 
+  if args?
+    unless isArray(args)
+      args = [obj, args]
+    else
+      args.unshift(obj)
+  else
+    args = [obj]
+
   call = (o) -> 
     o ?= obj
+    _args = args.slice()
+    _args.unshift(o)
     promise = (action._chain.reduce ((lastPromise, hooks) ->
       if hooks.length == 1
-        return lastPromise.then hooks[0].bind(obj, o, obj)
+        return lastPromise.then -> hooks[0].apply(obj, _args)
       else
-        return lastPromise.then -> Promise.all hooks.map (hook) -> hook.call(obj, o, obj)
+        return lastPromise.then -> Promise.all hooks.map (hook) -> hook.apply(obj, _args)
       ), Promise.resolve()).then -> return o
 
     return promise.catch catcher if catcher?

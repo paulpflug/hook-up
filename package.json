@@ -22,9 +22,9 @@
   "devDependencies": {
     "coffee-cli": "^0.2.1",
     "coffee-loader": "^0.9.0",
-    "coffeescript": "^2.2.1",
+    "coffeescript": "^2.3.0",
     "script-runner": "^0.1.7",
-    "snapy": "^0.1.1"
+    "snapy": "^0.1.2"
   },
   "keywords": [],
   "readmeFilename": "README.md",

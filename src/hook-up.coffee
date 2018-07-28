@@ -24,19 +24,28 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
   else
     args = [obj]
 
+  stateName = state?[actionName]
+
   call = (o) -> 
     o ?= obj
     _args = args.slice()
     _args.unshift(o)
-    promise = (action._chain.reduce ((lastPromise, hooks) ->
+    _state[stateName] = true if stateName
+    (action._chain.reduce ((lastPromise, hooks) ->
       if hooks.length == 1
         return lastPromise.then -> hooks[0].apply(obj, _args)
       else
         return lastPromise.then -> Promise.all hooks.map (hook) -> hook.apply(obj, _args)
-      ), Promise.resolve()).then -> return o
-
-    return promise.catch catcher if catcher?
-    return promise
+      ), Promise.resolve())
+      .then ->
+        _state[stateName] = false if stateName
+        return o
+      .catch (e) ->
+        _state[stateName] = false if stateName
+        if catcher?
+          catcher(e)
+        else
+          throw e
 
   hookIn = (index, cb) ->
     if isFunction(index)
@@ -62,14 +71,8 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
     action = {}
     action[names.call] = call
     action[names.hookIn] = hookIn
-  if (stateName = state?[actionName])?
-    reset = ->
-      action._chain = []
-      hookIn 0, -> _state[stateName] = true
-      hookIn _last, -> _state[stateName] = false 
-  else
-    reset = -> action._chain = []
-  action[names.reset] = action._reset = reset
+
+  action[names.reset] = action._reset = -> action._chain = []
   action._reset()
 
   return action

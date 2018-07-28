@@ -69,3 +69,19 @@ test (snap) =>
     # should show success, success
     snap obj:[arg3,arg4]
   obj.action()
+
+test (snap) =>
+  # test state
+  hookUp obj,
+    actions: "action"
+    state: action: "acting"
+  obj.action.hookIn => snap obj: obj.state
+  obj.action().then => snap obj: obj.state
+
+  # test state naming
+  hookUp obj,
+    actions: "action"
+    state: action: "acting"
+    names:
+      state: "status"
+  obj.action().then => snap obj: obj.status

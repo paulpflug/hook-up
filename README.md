@@ -70,26 +70,32 @@ hookUp(program,{
   catch: {
     "cache.get": (e) => { console.error(e) } 
   },
-  args: [someArg]
+  args: [someArg],
+  state: {
+    run: "running"
+  }
 })
 
 // hookIn([position:Number], cb:Function)
 // position defaults to program.position.during
 // (see below)
-program.run.hookIn((state,{config},someArg) => {
-  // config equals program.config
+program.run.hookIn((actionState, program, someArg) => {
   // someArg is passed from above
-  // it is recommend to test the state if you depend on it
+  // it is recommend to test the actionState if you depend on it
   // as you have no idea what the previous cbs did
-  if (// is in correct state) {
-    // doSomething with state
+  if (// is in correct actionState) {
+    // doSomething with actionState
   } 
+  // program.state.running == true
+
   // you don't need to return anything, each cb will be
-  // called with the current action and program state
+  // called with the current actionState
   // if you return a promise or the cb is async
   // the next cb will only get called afterwards
 })
-result = await program.run({})
+// program.state.running == false
+result = await program.run(actionState)
+// program.state.running == false
 
 // remove all cbs
 program.run.reset()
@@ -113,18 +119,20 @@ spread | Number | 8 | distance between the predefined positions
 position | Object | - | lookup object to use as predefined positions
 Promise | Object | native Promise | Promise lib to use
 args | Object or Array of Objects | - | additonal args passed on each action call
+state | Object | - | lookup object to match action to state
 names | Object | - | see below
 
 you can change the default names:
 ```js
-// available: "hookIn", "reset", "position", "call"
+// available: "hookIn", "reset", "position", "call", "state"
 hookUp(program = {},{
   actions: "run",
   names:{
     hookIn: "", // only one of hookIn or call can be empty
     reset: "clear",
     position: "pos",
-    call: "call"
+    call: "call",
+    state: "state"
   }
 })
 

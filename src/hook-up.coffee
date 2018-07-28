@@ -12,7 +12,7 @@ positions = ["init","before","during","after","end"]
 
 defaultPosition = "during"
 
-setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args}) ->
+setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, state, _state, _last}) ->
 
   catcher = catcher[actionName] if catcher? and not isFunction(catcher)
 
@@ -62,8 +62,15 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args}) 
     action = {}
     action[names.call] = call
     action[names.hookIn] = hookIn
-  action._chain = []
-  action[names.reset] = -> action._chain = []
+  if (stateName = state?[actionName])?
+    reset = ->
+      action._chain = []
+      hookIn 0, -> _state[stateName] = true
+      hookIn _last, -> _state[stateName] = false 
+  else
+    reset = -> action._chain = []
+  action[names.reset] = action._reset = reset
+  action._reset()
 
   return action
 
@@ -78,13 +85,19 @@ module.exports = (obj, options) ->
     names.call ?= ""
     names.reset ?= "reset"
     names.position ?= "position"
+    names.state ?= "state"
     if options.position?
       position = options.position
+      last = 0
+      for k,v of position
+        last = v if v > last
+      options._last = last
     else
       spread = options.spread || 8
       position = {}
       for name,i in (options.positions || positions)
         position[name] = i*spread
+      options._last = i*spread
     if (def = options.default)?
       if isString(def)
         options.default = position[def]
@@ -94,16 +107,21 @@ module.exports = (obj, options) ->
       options.default = position[defaultPosition]
 
     obj[names.position] = position
+
+    if options.state?
+      options._state = obj[names.state] = {}
+
     _actions = []
     obj[names.reset+"AllActions"] = =>
       for _action in _actions
-        _action._chain = []
+        _action._reset()
+
     actions = options.actions
     if isString(actions)
       actions = [actions]
     if isArray(actions)
       actions = {"": actions}
-    
+
     for k,v of actions
       if k
         tmp = obj[k] = {}
@@ -112,5 +130,8 @@ module.exports = (obj, options) ->
       for action in arrayize(v)
         actionName = if k then k+"."+action else action
         _actions.push tmp[action] = setupAction(actionName, obj, options)
+    
+    
+
 
   

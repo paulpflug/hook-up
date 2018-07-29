@@ -30,22 +30,23 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
     o ?= obj
     _args = args.slice()
     _args.unshift(o)
-    _state[stateName] = true if stateName
-    (action._chain.reduce ((lastPromise, hooks) ->
+    done = (action._chain.reduce ((lastPromise, hooks) ->
       if hooks.length == 1
         return lastPromise.then -> hooks[0].apply(obj, _args)
       else
         return lastPromise.then -> Promise.all hooks.map (hook) -> hook.apply(obj, _args)
       ), Promise.resolve())
       .then ->
-        _state[stateName] = false if stateName
+        _state[stateName] = false if stateName and _state[stateName] == done
         return o
       .catch (e) ->
-        _state[stateName] = false if stateName
+        _state[stateName] = false if stateName and _state[stateName] == done
         if catcher?
           catcher(e)
         else
           throw e
+    _state[stateName] = done if stateName
+    return done
 
   hookIn = (index, cb) ->
     if isFunction(index)

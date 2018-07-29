@@ -86,7 +86,7 @@ program.run.hookIn((actionState, program, someArg) => {
   if (// is in correct actionState) {
     // doSomething with actionState
   } 
-  // program.state.running == true
+  // program.state.running will be the promise from program.run
 
   // you don't need to return anything, each cb will be
   // called with the current actionState

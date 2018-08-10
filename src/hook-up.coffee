@@ -56,8 +56,8 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
       {cb, index} = index
       index ?= def
     unless cb? and index?
-      hookInName = names.hookIn or "hooking-in"
-      throw new Error "#{hookInName} needs a 'cb' and a 'index'"
+      hookInName = "."+names.hookIn or " hooking-in"
+      throw new Error "#{actionName}#{hookInName} needs a 'cb' and a 'index'"
     tmp = action._chain[index] ?= []
     tmp.push cb
     return -> tmp = tmp.splice i, 1 if ~(i = tmp.indexOf(cb))

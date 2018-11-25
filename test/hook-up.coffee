@@ -48,8 +48,13 @@ test (snap) =>
   # test catch
   hookUp obj,
     actions: "action"
-    catch: => return "success"
-  obj.action.hookIn => throw new Error()
+    catch: (e, obj ) => 
+      # should have Error
+      snap obj: e
+      # should have obj
+      snap obj: obj?
+      return "success"
+  obj.action.hookIn => throw new Error("Error")
   # should show success
   snap promise: obj.action()
 

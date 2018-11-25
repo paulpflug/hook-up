@@ -42,7 +42,7 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
       .catch (e) ->
         _state[stateName] = false if stateName and _state[stateName] == done
         if catcher?
-          catcher(e)
+          catcher.apply(obj, (tmp = _args.slice(1)).unshift(e) && tmp)
         else
           throw e
     _state[stateName] = done if stateName

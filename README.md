@@ -68,7 +68,7 @@ hookUp(program,{
     {"cache": ["get", "set"]}
   },
   catch: {
-    "cache.get": (e) => { console.error(e) } 
+    "cache.get": (e, program) => { console.error(e) } 
   },
   args: [someArg],
   state: {

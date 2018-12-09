@@ -27,7 +27,7 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
   stateName = state?[actionName]
 
   call = (o) -> 
-    o ?= obj
+    o ?= {}
     _args = args.slice()
     _args.unshift(o)
     done = (action._chain.reduce ((lastPromise, hooks) ->
@@ -84,7 +84,7 @@ module.exports = (obj, options) ->
     if isString(options) or isArray(options)
       options = actions: options
     options.Promise ?= Promise
-    names = options.names ?= {}
+    names = options.names ?= options.name || {}
     names.hookIn ?= "hookIn"
     names.call ?= ""
     names.reset ?= "reset"

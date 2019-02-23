@@ -15,25 +15,30 @@
   "engines": {
     "node": "*"
   },
-  "main": "lib/hook-up.js",
+  "main": "hook-up.js",
   "files": [
-    "lib/*.js"
+    "*.js"
   ],
   "devDependencies": {
     "coffee-cli": "^0.2.1",
     "coffee-loader": "^0.9.0",
-    "coffeescript": "^2.3.0",
-    "script-runner": "^0.1.7",
-    "snapy": "^0.1.2"
+    "coffeescript": "^2.3.2",
+    "script-runner": "^0.1.8",
+    "snapy": "^0.1.6"
   },
   "keywords": [],
   "readmeFilename": "README.md",
   "scripts": {
     "build": "run-npm build:*",
-    "build:node": "coffee-cli --no-header --compile --output lib/ src/*.coffee",
+    "build:node": "coffee-cli --no-header --compile --output . src/*.coffee",
+    "watch": "coffee-cli --watch --no-header --compile --output . src/*.coffee",
     "test": "snapy",
     "preversion": "npm run test",
     "version": "npm run build && git add .",
     "postversion": "git push && git push --tags && npm publish"
+  },
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "virtual-module-webpack-plugin": "^0.4.1"
   }
 }

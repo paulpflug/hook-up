@@ -143,6 +143,58 @@ result = await program.run.call({})
 program.run.clear()
 ```
 
+## Using default layout with webpack
+hook-up supports static dependency injection on compile time with the help of webpack.
+```
+# folder structure
+src/
+  index.js
+  action/
+    someAction.js
+  feature/
+    someFeature.js
+  util/
+    someUtil.js
+```
+```js
+// webpack.config.js
+module.exports = {
+  entry: {
+    index: "src/index.js"
+  },
+  plugins: [
+    require("hook-up/webpack")({
+      base: "src",
+      // will setup a action for each file in that folder
+      // and load them as a plugin
+      actions: "action", 
+      // will load all files from the folders as plugins
+      plugins: ["feature", "util"] 
+    })
+  ]
+}
+
+// src/index.js
+module.exports = async (options) => {
+  hookUp = require("hook-up/bootstrap")
+  await hookUp(options)
+}
+
+// action/someAction.js
+module.exports = async (app) => {
+  // setup code for someAction
+  app.someAction.hookIn(app.position.init, (state) => {
+    // do something
+  })
+}
+
+// util/someUtil.js
+module.exports = async (app) => {
+  app.util = {
+    isFunction : (fn) => {return typeof fn === "function" }
+  }
+}
+```
 ## License
 Copyright (c) 2017 Paul Pflugradt
 Licensed under the MIT license.

@@ -79,7 +79,7 @@ setupAction = (actionName, obj, {catch:catcher,names,default:def,Promise,args, s
   return action
 
 
-module.exports = (obj, options) ->
+setup = module.exports = (obj, options) ->
   if options?
     if isString(options) or isArray(options)
       options = actions: options
@@ -89,7 +89,7 @@ module.exports = (obj, options) ->
     names.call ?= ""
     names.reset ?= "reset"
     names.position ?= "position"
-    names.state ?= "state"
+    names.state ?= "is"
     if options.position?
       position = options.position
       last = 0
@@ -134,8 +134,4 @@ module.exports = (obj, options) ->
       for action in arrayize(v)
         actionName = if k then k+"."+action else action
         _actions.push tmp[action] = setupAction(actionName, obj, options)
-    
-    
-
-
-  
+ 

@@ -83,12 +83,12 @@ test (snap) =>
   obj.action.hookIn => 
     snap obj: obj.state
     #first false
-    obj.is.acting.then => snap obj: obj.is
+    obj.currently.acting.then => snap obj: obj.currently
     return null
   #second false
-  obj.action().then => snap obj: obj.is
+  obj.action().then => snap obj: obj.currently
 
-  # test state naming
+  # test state naming - should have result
   hookUp obj,
     actions: "action"
     state: action: "acting"

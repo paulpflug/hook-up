@@ -33,7 +33,7 @@
     "build:node": "coffee-cli --no-header --compile --output . src/*.coffee",
     "watch": "coffee-cli --watch --no-header --compile --output . src/*.coffee",
     "test": "snapy",
-    "preversion": "npm run test",
+    "!preversion": "npm run test",
     "version": "npm run build && git add .",
     "postversion": "git push && git push --tags && npm publish"
   },

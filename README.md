@@ -128,11 +128,12 @@ you can change the default names:
 hookUp(program = {},{
   actions: "run",
   names:{
-    hookIn: "", // only one of hookIn or call can be empty
-    reset: "clear",
-    position: "pos",
-    call: "call",
-    state: "state"
+    // only one of hookIn or call can be empty
+    hookIn: "", // default hookIn
+    reset: "clear", // default reset
+    position: "pos", // default position
+    call: "call", // default empty
+    state: "state" // default currently
   }
 })
 
